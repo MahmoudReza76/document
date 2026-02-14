@@ -1,1 +1,1 @@
-export const API_DOMAIN = "https://docs.danavan.ai";
+export const API_DOMAIN = "docs.danavan.ai";

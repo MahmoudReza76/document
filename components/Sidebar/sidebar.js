@@ -16,18 +16,15 @@ import {useSidebarStore} from "@/stores/sidebarStore";
 import {usePathname} from "next/navigation";
 import {API_DOMAIN} from "@/config";
 
-// تابع کمکی برای ساخت مسیر کامل
 function buildFullPath(items, targetSlug, projectKey, currentPath = []) {
   for (const item of items) {
     if (item.NodeType === "category") {
       const newPath = [...currentPath, item.Slug];
 
-      // اگر این category خودش هدف باشد (مثلاً header-only)
       if (item.Slug === targetSlug) {
         return `/${projectKey}/${newPath.join("/")}`;
       }
 
-      // جستجو در فرزندان
       if (item.Children && item.Children.length > 0) {
         const result = buildFullPath(
           item.Children,
@@ -42,7 +39,6 @@ function buildFullPath(items, targetSlug, projectKey, currentPath = []) {
     if (item.NodeType === "page") {
       const newPath = [...currentPath, item.Slug];
 
-      // اگر این page هدف باشد
       if (item.Slug === targetSlug) {
         return `/${projectKey}/${newPath.join("/")}`;
       }
@@ -51,7 +47,6 @@ function buildFullPath(items, targetSlug, projectKey, currentPath = []) {
   return null;
 }
 
-// کامپوننت اصلی RenderMenu با قابلیت track مسیر والدین
 function RenderMenu({items, projectKey, parentSlugs = []}) {
   const {expandedSections, toggleSection} = useSidebarStore();
   const pathname = usePathname();
@@ -68,7 +63,6 @@ function RenderMenu({items, projectKey, parentSlugs = []}) {
 
           return (
             <div key={item.Id} className="mb-1">
-              {/* برای categoryهای header-only */}
               {isHeaderOnly ? (
                 <div
                   className={`flex items-center justify-between w-full px-2 py-2 text-sm rounded-md font-bold ${
@@ -97,7 +91,6 @@ function RenderMenu({items, projectKey, parentSlugs = []}) {
                 </button>
               )}
 
-              {/* نمایش فرزندان اگر بخش باز باشد */}
               {isExpanded && item.Children?.length > 0 && (
                 <div className="ml-3 mt-1">
                   <RenderMenu
@@ -112,7 +105,6 @@ function RenderMenu({items, projectKey, parentSlugs = []}) {
         }
 
         if (item.NodeType === "page") {
-          // ساخت مسیر کامل شامل تمام والدین
           const fullPath = `/${projectKey}/${[...parentSlugs, item.Slug].join(
             "/"
           )}`;
@@ -141,31 +133,15 @@ function RenderMenu({items, projectKey, parentSlugs = []}) {
 }
 
 export default function Sidebar({domain = API_DOMAIN}) {
-  const [isOpen, setIsOpen] = useState(false);
   const {projectKey, lang} = useAppStore();
   const {data, isLoading, isError} = useMenu(domain, projectKey, lang);
+  const {isOpen, closeSidebar} = useSidebarStore();
 
   return (
     <>
-      {/* Mobile Menu Button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-4 left-4 z-50 p-2 rounded-lg bg-primary border border-gray-200 shadow-sm lg:hidden hover:bg-gray-50 transition-colors"
-      >
-        {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-      </button>
-
-      {/* Overlay */}
-      {isOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full w-64 bg-primary-sidebar-primary border border-primary/10 z-40 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static ${
+        className={`fixed top-0 left-0 h-full w-64 bg-primary-sidebar-primary border border-primary/10 bg-white dark:bg-neutral-950 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -173,8 +149,8 @@ export default function Sidebar({domain = API_DOMAIN}) {
           {/* Header */}
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center gap-2 mb-4">
-              <BookOpen className="w-6 h-6 text-gray-700" />
-              <span className="text-lg font-semibold text-gray-900">
+              <BookOpen className="w-6 h-6 text-primary" />
+              <span className="text-lg font-semibold text-primary">
                 Documentation
               </span>
             </div>

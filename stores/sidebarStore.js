@@ -9,5 +9,10 @@ export const useSidebarStore = create((set) => ({
         [section]: !state.expandedSections[section]
       }
     })),
-  setExpandedSections: (newState) => set({expandedSections: newState})
+  setExpandedSections: (newState) => set({expandedSections: newState}),
+
+  isOpen: false,
+  toggleSidebar: () => set((state) => ({isOpen: !state.isOpen})),
+  closeSidebar: () => set({isOpen: false}),
+  openSidebar: () => set({isOpen: true})
 }));
